@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>载人航天精神数字展馆</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        :root {
+            --primary-color: #0a1a35;
+            --secondary-color: #1a3a6c;
+            --accent-color: #00a8ff;
+            --text-color: #e0f2ff;
+            --highlight-color: #ffcc00;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(26, 58, 108, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 168, 255, 0.2) 0%, transparent 20%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 5s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        header {
+            background: linear-gradient(to bottom, rgba(10, 26, 53, 0.9), rgba(10, 26, 53, 0.7));
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 168, 255, 0.3);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-right: 15px;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #00a8ff, #a0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav li {
+            margin-left: 1.5rem;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        nav a.active {
+            color: var(--accent-color);
+            background-color: rgba(0, 168, 255, 0.1);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 80%;
+        }
+
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            background: radial-gradient(ellipse at center, rgba(26, 58, 108, 0.5) 0%, rgba(10, 26, 53, 0) 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: #a0e7ff;
+        }
+
+        .exhibition-halls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .hall-card {
+            background: rgba(26, 58, 108, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            position: relative;
+        }
+
+        .hall-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .hall-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .hall-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(10, 26, 53, 0.8));
+            display: flex;
+            align-items: flex-end;
+            padding: 1rem;
+        }
+
+        .hall-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .hall-content {
+            padding: 1.5rem;
+        }
+
+        .hall-content p {
+            margin-bottom: 1.5rem;
+            color: #c0e6ff;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--accent-color), #0088cc);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 168, 255, 0.4);
+        }
+
+        .timeline-container {
+            margin: 4rem 0;
+            padding: 2rem;
+            background: rgba(10, 26, 53, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+        }
+
+        .timeline-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--accent-color);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 10px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background-color: rgba(26, 58, 108, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(0, 168, 255, 0.3);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--accent-color);
+            border: 4px solid var(--primary-color);
+            border-radius: 50%;
+            top: 20px;
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd)::after {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even)::after {
+            left: -10px;
+        }
+
+        .timeline-year {
+            font-weight: bold;
+            color: var(--highlight-color);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .qrcode-section {
+            text-align: center;
+            margin: 4rem 0;
+            padding: 2rem;
+            background: rgba(10, 26, 53, 0.7);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+        }
+
+        .qrcode-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 1.5rem;
+        }
+
+        #qrcode {
+            margin: 1rem 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .copyright {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(0, 168, 255, 0.3);
+            color: #a0e7ff;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background: rgba(5, 15, 30, 0.9);
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .footer-links a {
+            color: var(--text-color);
+            margin-left: 1.5rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        /* 响应式设计 */
+        @media screen and (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            nav li {
+                margin: 0.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item:nth-child(even) {
+                left: 0;
+            }
+            
+            .timeline-item::after {
+                left: 21px;
+            }
+            
+            .timeline-item:nth-child(odd)::after,
+            .timeline-item:nth-child(even)::after {
+                left: 21px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+            
+            .footer-links {
+                margin-top: 1rem;
+            }
+            
+            .footer-links a {
+                margin: 0 0.5rem;
+            }
+        }
+
+        .page-content {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .hall-detail {
+            background: rgba(26, 58, 108, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+        }
+
+        .hall-detail h3 {
+            color: var(--highlight-color);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .hall-detail p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .hall-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .image-card {
+            border-radius: 8px;
+            overflow: hidden;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .image-card:hover {
+            transform: scale(1.05);
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--highlight-color);
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-rocket logo-icon"></i>
+                    <div class="logo-text">载人航天精神数字展馆</div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="home">首页</a></li>
+                        <li><a href="#" class="nav-link" data-page="history">发展历程厅</a></li>
+                        <li><a href="#" class="nav-link" data-page="heroes">英雄人物厅</a></li>
+                        <li><a href="#" class="nav-link" data-page="technology">科技成就厅</a></li>
+                        <li><a href="#" class="nav-link" data-page="spirit">精神传承厅</a></li>
+                        <li><a href="#" class="nav-link" data-page="future">未来展望厅</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 首页内容 -->
+    <section id="home" class="page-content active">
+        <div class="container">
+            <div class="hero">
+                <h1>载人航天精神数字展馆</h1>
+                <p>探索中国载人航天的壮丽历程，感受航天英雄的伟大精神，展望太空探索的无限未来</p>
+                <a href="#" class="btn start-tour">开始虚拟参观</a>
+            </div>
+
+            <div class="exhibition-halls">
+                <div class="hall-card">
+                    <div class="hall-image" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://via.placeholder.com/600x400/1a3a6c/ffffff?text=发展历程');">
+                        <div class="hall-overlay">
+                            <h3 class="hall-title">发展历程厅</h3>
+                        </div>
+                    </div>
+                    <div class="hall-content">
+                        <p>从"两弹一星"到空间站建设，回顾中国载人航天的辉煌发展历程。</p>
+                        <a href="#" class="btn nav-link" data-page="history">进入展厅</a>
+                    </div>
+                </div>
+
+                <div class="hall-card">
+                    <div class="hall-image" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://via.placeholder.com/600x400/1a3a6c/ffffff?text=英雄人物');">
+                        <div class="hall-overlay">
+                            <h3 class="hall-title">英雄人物厅</h3>
+                        </div>
+                    </div>
+                    <div class="hall-content">
+                        <p>致敬中国航天英雄，了解他们的奋斗故事和无私奉献精神。</p>
+                        <a href="#" class="btn nav-link" data-page="heroes">进入展厅</a>
+                    </div>
+                </div>
+
+                <div class="hall-card">
+                    <div class="hall-image" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://via.placeholder.com/600x400/1a3a6c/ffffff?text=科技成就');">
+                        <div class="hall-overlay">
+                            <h3 class="hall-title">科技成就厅</h3>
+                        </div>
+                    </div>
+                    <div class="hall-content">
+                        <p>展示中国载人航天的重大科技成果与技术创新。</p>
+                        <a href="#" class="btn nav-link" data-page="technology">进入展厅</a>
+                    </div>
+                </div>
+
+                <div class="hall-card">
+                    <div class="hall-image" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://via.placeholder.com/600x400/1a3a6c/ffffff?text=精神传承');">
+                        <div class="hall-overlay">
+                            <h3 class="hall-title">精神传承厅</h3>
+                        </div>
+                    </div>
+                    <div class="hall-content">
+                        <p>传承"特别能吃苦、特别能战斗、特别能攻关、特别能奉献"的载人航天精神。</p>
+                        <a href="#" class="btn nav-link" data-page="spirit">进入展厅</a>
+                    </div>
+                </div>
+
+                <div class="hall-card">
+                    <div class="hall-image" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://via.placeholder.com/600x400/1a3a6c/ffffff?text=未来展望');">
+                        <div class="hall-overlay">
+                            <h3 class="hall-title">未来展望厅</h3>
+                        </div>
+                    </div>
+                    <div class="hall-content">
+                        <p>展望中国载人航天的未来发展，探索深空探测与星际移民的可能性。</p>
+                        <a href="#" class="btn nav-link" data-page="future">进入展厅</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交互式时间轴 -->
+            <div class="timeline-container">
+                <h2 class="timeline-title">中国载人航天发展历程</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">1992年</div>
+                            <h3>载人航天工程立项</h3>
+                            <p>中国载人航天工程正式立项，代号"921工程"，确立了三步走的发展战略。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">1999年</div>
+                            <h3>神舟一号发射</h3>
+                            <p>中国第一艘无人试验飞船"神舟一号"成功发射，标志着中国载人航天技术取得重大突破。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2003年</div>
+                            <h3>神舟五号载人飞行</h3>
+                            <p>航天员杨利伟乘坐神舟五号飞船进入太空，成为中国首位太空人，实现了中华民族千年飞天梦想。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2008年</div>
+                            <h3>神舟七号太空行走</h3>
+                            <p>航天员翟志刚完成中国首次太空行走，使中国成为第三个掌握太空出舱技术的国家。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2012年</div>
+                            <h3>神舟九号与天宫一号交会对接</h3>
+                            <p>神舟九号与天宫一号成功实现载人交会对接，中国首位女航天员刘洋进入太空。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2021年</div>
+                            <h3>天和核心舱发射</h3>
+                            <p>中国空间站天和核心舱成功发射，标志着中国空间站建设进入全面实施阶段。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-year">2022年</div>
+                            <h3>中国空间站全面建成</h3>
+                            <p>问天实验舱、梦天实验舱相继发射并与核心舱对接，中国空间站"T"字基本构型组装完成。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 二维码区域 -->
+            <div class="qrcode-section">
+                <h2>扫描二维码访问展馆</h2>
+                <div class="qrcode-container">
+                    <div id="qrcode"></div>
+                    <p>手机扫描二维码，随时随地参观数字展馆</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 发展历程厅 -->
+    <section id="history" class="page-content">
+        <div class="container">
+            <a href="#" class="back-btn nav-link" data-page="home"><i class="fas fa-arrow-left"></i> 返回首页</a>
+            <h2 class="page-title">发展历程厅</h2>
+            
+            <div class="hall-detail">
+                <h3>中国载人航天发展历程</h3>
+                <p>中国载人航天工程自1992年正式启动以来，按照"三步走"发展战略，先后突破了载人天地往返、空间出舱活动、交会对接等关键技术，成功将航天员送入太空，建成了我国自己的空间站。</p>
+                <p>本展厅通过珍贵的历史资料、影像记录和实物模型，全面展示中国载人航天从无到有、从弱到强的辉煌历程。</p>
+                
+                <div class="hall-images">
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=神舟一号');">
+                        <div class="image-overlay">神舟一号试验飞船</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=神舟五号');">
+                        <div class="image-overlay">神舟五号首次载人飞行</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=天宫一号');">
+                        <div class="image-overlay">天宫一号目标飞行器</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=空间站');">
+                        <div class="image-overlay">中国空间站</div>
+                    </div>
+                </div>
+                
+                <h3>里程碑事件</h3>
+                <p><strong>1992年9月21日</strong> - 中央正式批准实施载人航天工程，命名为"921工程"。</p>
+                <p><strong>1999年11月20日</strong> - 神舟一号无人试验飞船成功发射，在轨运行21小时后成功返回。</p>
+                <p><strong>2003年10月15日</strong> - 神舟五号搭载航天员杨利伟进入太空，中国成为世界上第三个独立掌握载人航天技术的国家。</p>
+                <p><strong>2008年9月25日</strong> - 神舟七号发射，航天员翟志刚完成中国首次太空行走。</p>
+                <p><strong>2011年9月29日</strong> - 天宫一号目标飞行器发射，为中国空间站建设奠定基础。</p>
+                <p><strong>2012年6月16日</strong> - 神舟九号与天宫一号成功实现载人交会对接，中国首位女航天员刘洋进入太空。</p>
+                <p><strong>2021年4月29日</strong> - 中国空间站天和核心舱发射成功，空间站建造进入全面实施阶段。</p>
+                <p><strong>2022年11月29日</strong> - 神舟十五号发射，中国空间站首次实现6名航天员"太空会师"。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 英雄人物厅 -->
+    <section id="heroes" class="page-content">
+        <div class="container">
+            <a href="#" class="back-btn nav-link" data-page="home"><i class="fas fa-arrow-left"></i> 返回首页</a>
+            <h2 class="page-title">英雄人物厅</h2>
+            
+            <div class="hall-detail">
+                <h3>中国航天英雄谱</h3>
+                <p>在中国载人航天事业的发展历程中，涌现出了一大批可歌可泣的英雄人物。他们中有航天员、科学家、工程师和技术人员，他们用智慧和汗水，甚至生命，铸就了中国航天的辉煌。</p>
+                
+                <div class="hall-images">
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=杨利伟');">
+                        <div class="image-overlay">杨利伟 - 中国首位航天员</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=翟志刚');">
+                        <div class="image-overlay">翟志刚 - 中国太空行走第一人</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=刘洋');">
+                        <div class="image-overlay">刘洋 - 中国首位女航天员</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=景海鹏');">
+                        <div class="image-overlay">景海鹏 - 三度飞天的航天员</div>
+                    </div>
+                </div>
+                
+                <h3>航天员风采</h3>
+                <p><strong>杨利伟</strong> - 2003年10月15日，乘坐神舟五号飞船进入太空，成为中国首位进入太空的航天员，实现了中华民族的千年飞天梦想。</p>
+                <p><strong>费俊龙、聂海胜</strong> - 2005年10月12日，乘坐神舟六号飞船进入太空，完成了中国首次"多人多天"太空飞行任务。</p>
+                <p><strong>翟志刚、刘伯明、景海鹏</strong> - 2008年9月25日，乘坐神舟七号飞船进入太空，翟志刚完成了中国首次太空行走。</p>
+                <p><strong>景海鹏、刘旺、刘洋</strong> - 2012年6月16日，乘坐神舟九号飞船与天宫一号成功交会对接，刘洋成为中国首位进入太空的女航天员。</p>
+                <p><strong>聂海胜、张晓光、王亚平</strong> - 2013年6月11日，乘坐神舟十号飞船进入太空，王亚平在太空进行了科普授课。</p>
+                
+                <h3>幕后英雄</h3>
+                <p>除了这些飞向太空的航天员，还有成千上万的科研人员、工程师和技术工人默默奉献在载人航天事业的第一线。他们中有火箭总设计师、飞船系统专家、发射场技术人员、地面测控人员等，他们共同构成了中国载人航天的坚强基石。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 科技成就厅 -->
+    <section id="technology" class="page-content">
+        <div class="container">
+            <a href="#" class="back-btn nav-link" data-page="home"><i class="fas fa-arrow-left"></i> 返回首页</a>
+            <h2 class="page-title">科技成就厅</h2>
+            
+            <div class="hall-detail">
+                <h3>中国载人航天重大科技成果</h3>
+                <p>中国载人航天工程实施以来，突破了一系列关键技术，取得了举世瞩目的科技成就，推动了我国航天科技和相关产业的发展。</p>
+                
+                <div class="hall-images">
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=长征火箭');">
+                        <div class="image-overlay">长征系列运载火箭</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=神舟飞船');">
+                        <div class="image-overlay">神舟系列载人飞船</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=空间站');">
+                        <div class="image-overlay">中国空间站</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=航天服');">
+                        <div class="image-overlay">飞天舱外航天服</div>
+                    </div>
+                </div>
+                
+                <h3>关键技术突破</h3>
+                <p><strong>载人天地往返技术</strong> - 成功研制神舟系列载人飞船，掌握了可靠的载人天地往返技术，确保航天员安全进入太空并返回地球。</p>
+                <p><strong>空间交会对接技术</strong> - 突破了自动和手动交会对接技术，实现了飞船与空间实验室、空间站的精准对接。</p>
+                <p><strong>航天员出舱活动技术</strong> - 研制了"飞天"舱外航天服，掌握了航天员舱外活动技术，为后续空间站建设和维护奠定了基础。</p>
+                <p><strong>空间站建造与运营技术</strong> - 掌握了大型空间设施的在线组装、长期运营和航天员长期驻留技术。</p>
+                <p><strong>再生式生命保障技术</strong> - 突破了水、氧气等生命必需物质的再生利用技术，减少了空间站对地面补给的依赖。</p>
+                
+                <h3>创新成果应用</h3>
+                <p>载人航天技术的发展带动了众多高新技术领域的进步，许多航天科技成果已经转化为民用产品，惠及国计民生。例如：</p>
+                <p>• 航天医学研究成果应用于临床医疗</p>
+                <p>• 航天新材料应用于民用产品制造</p>
+                <p>• 航天电子技术提升了民用电子产品性能</p>
+                <p>• 航天环保技术应用于环境污染治理</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 精神传承厅 -->
+    <section id="spirit" class="page-content">
+        <div class="container">
+            <a href="#" class="back-btn nav-link" data-page="home"><i class="fas fa-arrow-left"></i> 返回首页</a>
+            <h2 class="page-title">精神传承厅</h2>
+            
+            <div class="hall-detail">
+                <h3>载人航天精神的内涵</h3>
+                <p>载人航天精神是"特别能吃苦、特别能战斗、特别能攻关、特别能奉献"的精神，是我国航天事业在长期奋斗中孕育形成的宝贵精神财富。</p>
+                
+                <div class="hall-images">
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=艰苦奋斗');">
+                        <div class="image-overlay">特别能吃苦</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=团结协作');">
+                        <div class="image-overlay">特别能战斗</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=科技创新');">
+                        <div class="image-overlay">特别能攻关</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=无私奉献');">
+                        <div class="image-overlay">特别能奉献</div>
+                    </div>
+                </div>
+                
+                <h3>精神内涵解读</h3>
+                <p><strong>特别能吃苦</strong> - 体现了航天人艰苦奋斗的优良作风。在条件艰苦、资源有限的条件下，航天人克服重重困难，勇攀科技高峰。</p>
+                <p><strong>特别能战斗</strong> - 体现了航天人敢打硬仗、能打胜仗的坚强意志。面对急难险重任务，航天人团结协作、攻坚克难，确保各项任务圆满完成。</p>
+                <p><strong>特别能攻关</strong> - 体现了航天人勇于创新、追求卓越的科学精神。在关键技术领域，航天人勇于探索、大胆创新，突破了一系列技术瓶颈。</p>
+                <p><strong>特别能奉献</strong> - 体现了航天人淡泊名利、默默奉献的崇高品格。许多航天人隐姓埋名、不计得失，为航天事业奉献了青春和智慧。</p>
+                
+                <h3>精神的时代价值</h3>
+                <p>载人航天精神不仅是航天事业的宝贵财富，也是激励全国人民为实现中华民族伟大复兴而奋斗的强大精神动力。在新时代，传承和弘扬载人航天精神具有重要的现实意义：</p>
+                <p>• 激励科技工作者勇攀科技高峰，加快建设科技强国</p>
+                <p>• 鼓舞广大青年树立远大理想，担当时代重任</p>
+                <p>• 引导全社会形成尊重科学、崇尚创新的良好氛围</p>
+                <p>• 凝聚民族力量，增强民族自信心和自豪感</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 未来展望厅 -->
+    <section id="future" class="page-content">
+        <div class="container">
+            <a href="#" class="back-btn nav-link" data-page="home"><i class="fas fa-arrow-left"></i> 返回首页</a>
+            <h2 class="page-title">未来展望厅</h2>
+            
+            <div class="hall-detail">
+                <h3>中国载人航天的未来蓝图</h3>
+                <p>随着中国空间站的全面建成和运营，中国载人航天工程进入了新的发展阶段。未来，中国将继续深化空间站应用，开展载人月球探测，并朝着更遥远的深空迈进。</p>
+                
+                <div class="hall-images">
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=月球基地');">
+                        <div class="image-overlay">载人月球探测</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=深空探测');">
+                        <div class="image-overlay">深空探测</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=空间应用');">
+                        <div class="image-overlay">空间应用拓展</div>
+                    </div>
+                    <div class="image-card" style="background-image: url('https://via.placeholder.com/400x300/1a3a6c/ffffff?text=国际合作');">
+                        <div class="image-overlay">国际合作</div>
+                    </div>
+                </div>
+                
+                <h3>未来发展目标</h3>
+                <p><strong>空间站应用与拓展</strong> - 中国空间站将在轨运营10年以上，开展大规模空间科学实验和技术试验，同时考虑空间站的扩展与升级，为航天员提供更舒适的工作生活环境。</p>
+                <p><strong>载人月球探测</strong> - 中国正在研制新一代载人运载火箭和载人飞船，计划在2030年前实现中国人首次登陆月球，开展月球科学考察和技术试验。</p>
+                <p><strong>深空探测</strong> - 在完成月球探测后，中国将朝着更远的深空迈进，开展火星采样返回、小行星探测等任务，为未来的载人深空探测奠定基础。</p>
+                <p><strong>空间科学技术创新</strong> - 通过空间科学实验，在生命科学、材料科学、天文观测等领域取得重大原创性成果，推动科技进步和产业发展。</p>
+                
+                <h3>国际合作展望</h3>
+                <p>中国载人航天始终坚持和平利用太空的原则，积极开展国际合作。中国空间站已迎来多个国家的科学实验项目，未来将继续扩大国际合作，与世界各国共同探索宇宙奥秘，为人类和平利用太空作出更大贡献。</p>
+                
+                <h3>太空经济前景</h3>
+                <p>随着航天技术的不断成熟和成本的降低，太空经济将迎来快速发展。太空旅游、太空资源开发利用、太空制造等新兴产业将逐步形成，为经济社会发展注入新动能。</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="copyright">
+                <p>小榄中学<<载人航天精神数字展馆设计>>项目组成员制作 &copy; 2025年</p>
+                <p>载人航天精神数字展馆 - 弘扬航天精神，激发爱国热情</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 200;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 随机大小
+                const size = Math.random() * 3;
+                
+                // 随机动画延迟
+                const delay = Math.random() * 5;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 页面导航功能
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetPage = this.getAttribute('data-page');
+                
+                // 更新导航激活状态
+                document.querySelectorAll('.nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // 显示目标页面
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(targetPage).classList.add('active');
+                
+                // 滚动到顶部
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // 生成二维码
+        function generateQRCode() {
+            const websiteURL = window.location.href;
+            const qrcodeContainer = document.getElementById('qrcode');
+            
+            // 清空容器
+            qrcodeContainer.innerHTML = '';
+            
+            // 生成二维码
+            QRCode.toCanvas(websiteURL, { width: 150 }, function(err, canvas) {
+                if (err) {
+                    console.error(err);
+                    qrcodeContainer.innerHTML = '<p>二维码生成失败</p>';
+                    return;
+                }
+                qrcodeContainer.appendChild(canvas);
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            generateQRCode();
+            
+            // 开始虚拟参观按钮
+            document.querySelector('.start-tour').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.nav-link[data-page="history"]').click();
+            });
+        });
+    </script>
+</body>
+</html>
